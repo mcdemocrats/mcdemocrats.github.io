@@ -367,7 +367,7 @@
     .popup-cta {
       display: block;
       background: var(--red);
-      color: var(--white);
+      color: var(--white) !important;
       text-align: center;
       padding: 0.6rem 0.85rem;
       border-radius: 4px;
@@ -541,11 +541,7 @@
   }
 
   function emailHref(pName) {
-    const subject = encodeURIComponent(`Interest in Becoming Precinct Captain — ${pName}`);
-    const body = encodeURIComponent(
-      `Hello,\n\nI am interested in serving as a Precinct Captain for ${pName} with the Marshall County Democratic Party.\n\nPlease contact me with more information.\n\nThank you!`
-    );
-    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    return 'https://forms.gle/b8UpdVnUXjaKmRqU7';
   }
 
   function precinctId(feature) {
