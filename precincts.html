@@ -38,378 +38,23 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
 
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --navy:  #0D2340;
-      --blue:  #1B4F8A;
-      --sky:   #3D7CC9;
-      --red:   #C0232C;
-      --cream: #F5F0E8;
-      --sand:  #E8DFD0;
-      --ink:   #1A1A1A;
-      --mist:  #8A9BB0;
-      --white: #FFFFFF;
-      --serif: 'Playfair Display', Georgia, serif;
-      --sans:  'Source Sans 3', 'Helvetica Neue', sans-serif;
-    }
-
-    html, body { height: 100%; font-family: var(--sans); background: var(--cream); color: var(--ink); }
-
-    /* ── HEADER ─────────────────────────────────────── */
-    header {
-      background: var(--navy);
-      border-bottom: 3px solid var(--red);
-      padding: 0 2rem;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 0.65rem;
-      text-decoration: none;
-    }
-    .logo svg { flex-shrink: 0; }
-    .logo-text {
-      font-family: var(--serif);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.2;
-    }
-    .logo-text span {
-      display: block;
-      font-family: var(--sans);
-      font-size: 0.68rem;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #7EB3E8;
-    }
-    .back-link {
-      font-family: var(--sans);
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #A8C4E0;
-      text-decoration: none;
-      letter-spacing: 0.04em;
-      transition: color 0.2s;
-    }
-    .back-link:hover { color: var(--white); }
-
-    /* ── PAGE LAYOUT ────────────────────────────────── */
-    .page {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      height: calc(100vh - 60px);
-    }
-
-    /* ── SIDEBAR ─────────────────────────────────────── */
-    .sidebar {
-      background: var(--white);
-      border-right: 1px solid var(--sand);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .sidebar-head {
-      background: var(--navy);
-      padding: 1.5rem 1.5rem 1.25rem;
-      flex-shrink: 0;
-    }
-    .sidebar-head h1 {
-      font-family: var(--serif);
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--white);
-      line-height: 1.2;
-      margin-bottom: 0.4rem;
-    }
-    .sidebar-head p {
-      font-size: 0.85rem;
-      font-weight: 300;
-      color: #A8C4E0;
-      line-height: 1.5;
-    }
-
-    /* address search */
-    .search-area {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--sand);
-      flex-shrink: 0;
-    }
-    .search-label {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--mist);
-      margin-bottom: 0.5rem;
-    }
-    .search-row {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .search-input {
-      flex: 1;
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      padding: 0.6rem 0.85rem;
-      border: 1.5px solid #D0D8E4;
-      border-radius: 4px;
-      outline: none;
-      transition: border-color 0.2s;
-      color: var(--ink);
-      background: var(--cream);
-    }
-    .search-input:focus { border-color: var(--sky); background: var(--white); }
-    .search-input::placeholder { color: #AAB5C4; }
-    .search-btn {
-      background: var(--blue);
-      color: var(--white);
-      border: none;
-      border-radius: 4px;
-      padding: 0.6rem 1rem;
-      font-family: var(--sans);
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-    .search-btn:hover { background: var(--navy); }
-    .search-hint {
-      font-size: 0.76rem;
-      color: var(--mist);
-      margin-top: 0.4rem;
-    }
-
-    /* status / result panel */
-    .result-panel {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1.25rem 1.5rem;
-    }
-
-    .status-idle {
-      text-align: center;
-      padding: 2rem 1rem;
-    }
-    .status-idle svg { opacity: 0.18; margin-bottom: 0.75rem; }
-    .status-idle p {
-      font-size: 0.9rem;
-      color: var(--mist);
-      line-height: 1.6;
-    }
-
-    .status-loading {
-      text-align: center;
-      padding: 2rem 1rem;
-    }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid var(--sand);
-      border-top-color: var(--sky);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 1rem;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .status-loading p { font-size: 0.9rem; color: var(--mist); }
-
-    .status-error {
-      background: #FFF0F0;
-      border: 1px solid #F5C6C6;
-      border-radius: 6px;
-      padding: 1rem;
-      font-size: 0.88rem;
-      color: var(--red);
-      line-height: 1.5;
-    }
-
-    /* found precinct card */
-    .precinct-card {
-      background: var(--cream);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-    .precinct-card-top {
-      background: var(--navy);
-      padding: 1rem 1.25rem;
-    }
-    .precinct-card-top .label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #7EB3E8;
-      margin-bottom: 0.3rem;
-    }
-    .precinct-card-top h2 {
-      font-family: var(--serif);
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--white);
-    }
-    .precinct-card-body {
-      padding: 1rem 1.25rem;
-    }
-    .precinct-card-body p {
-      font-size: 0.88rem;
-      color: #555;
-      line-height: 1.6;
-      margin-bottom: 0.85rem;
-    }
-
-    .cta-btn {
-      display: block;
-      width: 100%;
-      background: var(--red);
-      color: var(--white);
-      border: none;
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      font-family: var(--sans);
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .cta-btn:hover { background: #a01d25; transform: translateY(-1px); }
-
-    /* precinct list */
-    .precinct-list-head {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--mist);
-      margin-bottom: 0.6rem;
-      padding-top: 0.25rem;
-    }
-    .precinct-list-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.55rem 0.75rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.15s;
-      margin-bottom: 2px;
-      font-size: 0.88rem;
-      color: var(--ink);
-    }
-    .precinct-list-item:hover { background: var(--cream); }
-    .precinct-list-item.active { background: #DDEEFF; font-weight: 700; color: var(--navy); }
-    .precinct-list-item .num {
-      background: var(--navy);
-      color: var(--white);
-      font-size: 0.7rem;
-      font-weight: 700;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .precinct-list-item.active .num { background: var(--red); }
-
-    /* ── MAP ─────────────────────────────────────────── */
-    #map {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    /* map attribution override */
-    .leaflet-control-attribution { font-size: 10px; }
-
-    /* ── MOBILE ──────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .page {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: auto;
-        min-height: calc(100vh - 60px);
-      }
-      .sidebar {
-        height: auto;
-        max-height: 50vh;
-        border-right: none;
-        border-bottom: 1px solid var(--sand);
-      }
-      #map { height: 55vw; min-height: 300px; }
-    }
-
-    /* leaflet popup custom */
-    .leaflet-popup-content-wrapper {
-      border-radius: 6px;
-      padding: 0;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    }
-    .leaflet-popup-content { margin: 0; width: auto !important; }
-    .leaflet-popup-tip { display: none; }
-    .popup-inner {
-      min-width: 220px;
-    }
-    .popup-head {
-      background: var(--navy);
-      padding: 0.85rem 1rem;
-      color: var(--white);
-    }
-    .popup-head .sub {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #7EB3E8;
-      margin-bottom: 0.2rem;
-    }
-    .popup-head h3 {
-      font-family: var(--serif);
-      font-size: 1.05rem;
-      font-weight: 700;
-    }
-    .popup-body { padding: 0.85rem 1rem; }
-    .popup-body p {
-      font-size: 0.82rem;
-      color: #555;
-      line-height: 1.5;
-      margin-bottom: 0.75rem;
-    }
-    .popup-cta {
-      display: block;
-      background: var(--red);
-      color: var(--white) !important;
-      text-align: center;
-      padding: 0.6rem 0.85rem;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .popup-cta:hover { background: #a01d25; }
-  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8BF7036TMF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8BF7036TMF');
+  </script>
 </head>
-<body>
+<body class="map-page">
 
 <!-- HEADER -->
 <header>
-  <a href="index.html" class="logo">
+  <a href="index.html" class="logo" data-track="click-logo">
     <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
       <circle cx="16" cy="16" r="15" fill="#1B4F8A" stroke="#3D7CC9" stroke-width="1"/>
       <path d="M16 7 L17.8 13.2 H24.3 L18.7 16.9 L20.5 23.1 L16 19.4 L11.5 23.1 L13.3 16.9 L7.7 13.2 H14.2 Z" fill="#FFFFFF"/>
@@ -419,7 +64,7 @@
       <span>Precinct Map</span>
     </div>
   </a>
-  <a href="/" class="back-link">← Back to Home</a>
+  <a href="/" class="back-link" data-track="click-back-home">← Back to Home</a>
 </header>
 
 <!-- MAIN LAYOUT -->
@@ -442,7 +87,7 @@
           placeholder="e.g. 123 Main St, Madill"
           autocomplete="off"
         />
-        <button class="search-btn" id="search-btn" onclick="geocodeAddress()">Find</button>
+        <button class="search-btn" id="search-btn" onclick="geocodeAddress()" data-track="click-search-precinct">Find</button>
       </div>
       <p class="search-hint">Street address in Marshall County, OK</p>
     </div>
@@ -471,7 +116,7 @@
           </div>
           <div class="precinct-card-body">
             <p>You live in this voting precinct. Click the button below to let us know you're interested in serving as a Precinct Officer — no experience required!</p>
-            <a id="found-cta" href="#" class="cta-btn">Become Precinct Officer →</a>
+            <a id="found-cta" href="#" class="cta-btn" data-track="click-become-officer-sidebar">Become Precinct Officer →</a>
           </div>
         </div>
 
@@ -614,6 +259,7 @@
       el.id = `list-item-${id}`;
       el.innerHTML = `<span>${name}</span><span class="num">${allFeatures.indexOf(feature)+1}</span>`;
       el.addEventListener('click', () => {
+        if (typeof gtag === 'function') gtag('event', 'click-precinct-list-item', { precinct_name: name });
         precinctLayer.eachLayer(layer => {
           if (precinctId(layer.feature) === id) {
             selectPrecinct(id, feature, layer);
@@ -628,6 +274,7 @@
   function selectPrecinct(id, feature, layer) {
     activePrecinctId = id;
     const name = precinctName(feature);
+    if (typeof gtag === 'function') gtag('event', 'click-precinct-map', { precinct_name: name });
 
     // Reset all styles
     precinctLayer.eachLayer(l => {
@@ -655,7 +302,7 @@
           </div>
           <div class="popup-body">
             <p>Want to help lead Democrats in ${name}? Precinct Officers are the backbone of local organizing.</p>
-            <a class="popup-cta" href="${emailHref(name)}">Become Precinct Officer →</a>
+            <a class="popup-cta" href="${emailHref(name)}" data-track="click-become-officer-popup" data-precinct-name="${name}">Become Precinct Officer →</a>
           </div>
         </div>
       `)
@@ -669,6 +316,7 @@
     setState('found');
     document.getElementById('found-name').textContent = name;
     document.getElementById('found-cta').href = emailHref(name);
+    document.getElementById('found-cta').dataset.precinctName = name;
   }
 
   // ── Address geocoding ────────────────────────────────────────
@@ -805,6 +453,14 @@
     renderPrecincts(data);
     renderList();
   }
+
+  // Analytics click tracking
+  document.addEventListener('click', function(e) {
+    const el = e.target.closest('[data-track]');
+    if (!el || typeof gtag !== 'function') return;
+    const params = el.dataset.precinctName ? { precinct_name: el.dataset.precinctName } : undefined;
+    gtag('event', el.dataset.track, params);
+  });
 
   loadPrecincts();
 </script>
