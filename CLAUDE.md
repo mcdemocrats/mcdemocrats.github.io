@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Static website for the Marshall County Democratic Party (Oklahoma), hosted via GitHub Pages at `mcdemocrats.com`. No build system, no dependencies, no package manager — all HTML, CSS, and JS are inline in two files.
+Static website for the Marshall County Democratic Party (Oklahoma), hosted via GitHub Pages at `mcdemocrats.com`. No build system, no dependencies, no package manager — CSS lives in `styles.css`, JS is inline in each HTML file.
 
 ## Development
 
@@ -30,7 +30,9 @@ Two standalone HTML pages sharing a single `styles.css`. JS remains inline in ea
 
 ## Design System
 
-Both pages use the same CSS custom properties (defined in `:root`):
+All styles live in `styles.css`, shared by both pages. `precincts.html` adds `class="map-page"` to `<body>` to scope its full-viewport layout overrides (header height 60px vs 64px, `body { height: 100% }`, sidebar/map grid).
+
+CSS custom properties defined in `:root`:
 
 | Variable | Value | Usage |
 |---|---|---|
@@ -42,6 +44,25 @@ Both pages use the same CSS custom properties (defined in `:root`):
 | `--sand` | `#E8DFD0` | Section backgrounds |
 | `--serif` | Playfair Display | Headings |
 | `--sans` | Source Sans 3 | Body, UI |
+
+## Analytics
+
+Both pages fire identical events to GA4 and PostHog in parallel. A single delegated `click` listener on `document` reads `data-track` attributes and calls both SDKs. Two events in `precincts.html` are fired directly from JS (not via `data-track`) because they need a `precinct_name` parameter resolved at runtime:
+
+```js
+// delegated (all data-track elements)
+if (typeof gtag !== 'undefined') gtag('event', el.dataset.track, params);
+if (typeof posthog !== 'undefined') posthog.capture(el.dataset.track, params);
+
+// direct (precincts page only)
+gtag('event', 'click-precinct-map', { precinct_name: name });
+posthog.capture('click-precinct-map', { precinct_name: name });
+```
+
+Events that carry `precinct_name` use `data-precinct-name` on the element (set dynamically by `showFoundState()` for the sidebar CTA, and injected into the Leaflet popup template string). All event names are kebab-case.
+
+- **Google Analytics 4** — measurement ID `G-8BF7036TMF`
+- **PostHog** — project key `phc_wAtyDUxEMvLY6Pwc3s2aY4QR4ZUfZTHZXCTLUYS9ywVw`, host `us.i.posthog.com`
 
 ## Key External Dependencies
 
