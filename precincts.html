@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precinct Map · Marshall County Democrats</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #0D2340;
+      --blue:  #1B4F8A;
+      --sky:   #3D7CC9;
+      --red:   #C0232C;
+      --cream: #F5F0E8;
+      --sand:  #E8DFD0;
+      --ink:   #1A1A1A;
+      --mist:  #8A9BB0;
+      --white: #FFFFFF;
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'Source Sans 3', 'Helvetica Neue', sans-serif;
+    }
+
+    html, body { height: 100%; font-family: var(--sans); background: var(--cream); color: var(--ink); }
+
+    /* ── HEADER ─────────────────────────────────────── */
+    header {
+      background: var(--navy);
+      border-bottom: 3px solid var(--red);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.65rem;
+      text-decoration: none;
+    }
+    .logo svg { flex-shrink: 0; }
+    .logo-text {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .logo-text span {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7EB3E8;
+    }
+    .back-link {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #A8C4E0;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--white); }
+
+    /* ── PAGE LAYOUT ────────────────────────────────── */
+    .page {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      height: calc(100vh - 60px);
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      background: var(--white);
+      border-right: 1px solid var(--sand);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-head {
+      background: var(--navy);
+      padding: 1.5rem 1.5rem 1.25rem;
+      flex-shrink: 0;
+    }
+    .sidebar-head h1 {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+    .sidebar-head p {
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: #A8C4E0;
+      line-height: 1.5;
+    }
+
+    /* address search */
+    .search-area {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--sand);
+      flex-shrink: 0;
+    }
+    .search-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 0.5rem;
+    }
+    .search-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .search-input {
+      flex: 1;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #D0D8E4;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s;
+      color: var(--ink);
+      background: var(--cream);
+    }
+    .search-input:focus { border-color: var(--sky); background: var(--white); }
+    .search-input::placeholder { color: #AAB5C4; }
+    .search-btn {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      padding: 0.6rem 1rem;
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: var(--navy); }
+    .search-hint {
+      font-size: 0.76rem;
+      color: var(--mist);
+      margin-top: 0.4rem;
+    }
+
+    /* status / result panel */
+    .result-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .status-idle {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .status-idle svg { opacity: 0.18; margin-bottom: 0.75rem; }
+    .status-idle p {
+      font-size: 0.9rem;
+      color: var(--mist);
+      line-height: 1.6;
+    }
+
+    .status-loading {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--sand);
+      border-top-color: var(--sky);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-loading p { font-size: 0.9rem; color: var(--mist); }
+
+    .status-error {
+      background: #FFF0F0;
+      border: 1px solid #F5C6C6;
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 0.88rem;
+      color: var(--red);
+      line-height: 1.5;
+    }
+
+    /* found precinct card */
+    .precinct-card {
+      background: var(--cream);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .precinct-card-top {
+      background: var(--navy);
+      padding: 1rem 1.25rem;
+    }
+    .precinct-card-top .label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7EB3E8;
+      margin-bottom: 0.3rem;
+    }
+    .precinct-card-top h2 {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .precinct-card-body {
+      padding: 1rem 1.25rem;
+    }
+    .precinct-card-body p {
+      font-size: 0.88rem;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 0.85rem;
+    }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .cta-btn:hover { background: #a01d25; transform: translateY(-1px); }
+
+    /* precinct list */
+    .precinct-list-head {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 0.6rem;
+      padding-top: 0.25rem;
+    }
+    .precinct-list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 2px;
+      font-size: 0.88rem;
+      color: var(--ink);
+    }
+    .precinct-list-item:hover { background: var(--cream); }
+    .precinct-list-item.active { background: #DDEEFF; font-weight: 700; color: var(--navy); }
+    .precinct-list-item .num {
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.7rem;
+      font-weight: 700;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .precinct-list-item.active .num { background: var(--red); }
+
+    /* ── MAP ─────────────────────────────────────────── */
+    #map {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* map attribution override */
+    .leaflet-control-attribution { font-size: 10px; }
+
+    /* ── MOBILE ──────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+        min-height: calc(100vh - 60px);
+      }
+      .sidebar {
+        height: auto;
+        max-height: 50vh;
+        border-right: none;
+        border-bottom: 1px solid var(--sand);
+      }
+      #map { height: 55vw; min-height: 300px; }
+    }
+
+    /* leaflet popup custom */
+    .leaflet-popup-content-wrapper {
+      border-radius: 6px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .leaflet-popup-content { margin: 0; width: auto !important; }
+    .leaflet-popup-tip { display: none; }
+    .popup-inner {
+      min-width: 220px;
+    }
+    .popup-head {
+      background: var(--navy);
+      padding: 0.85rem 1rem;
+      color: var(--white);
+    }
+    .popup-head .sub {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #7EB3E8;
+      margin-bottom: 0.2rem;
+    }
+    .popup-head h3 {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .popup-body { padding: 0.85rem 1rem; }
+    .popup-body p {
+      font-size: 0.82rem;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+    .popup-cta {
+      display: block;
+      background: var(--red);
+      color: var(--white);
+      text-align: center;
+      padding: 0.6rem 0.85rem;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .popup-cta:hover { background: #a01d25; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="15" fill="#1B4F8A" stroke="#3D7CC9" stroke-width="1"/>
+      <path d="M16 7 L17.8 13.2 H24.3 L18.7 16.9 L20.5 23.1 L16 19.4 L11.5 23.1 L13.3 16.9 L7.7 13.2 H14.2 Z" fill="#FFFFFF"/>
+    </svg>
+    <div class="logo-text">
+      Marshall County Democrats
+      <span>Precinct Map</span>
+    </div>
+  </a>
+  <a href="index.html" class="back-link">← Back to Home</a>
+</header>
+
+<!-- MAIN LAYOUT -->
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <h1>Find Your Precinct</h1>
+      <p>Enter your Marshall County address to highlight your voting precinct, then click it to express interest in becoming a precinct captain.</p>
+    </div>
+
+    <div class="search-area">
+      <label class="search-label" for="addr-input">Your address</label>
+      <div class="search-row">
+        <input
+          id="addr-input"
+          class="search-input"
+          type="text"
+          placeholder="e.g. 123 Main St, Madill"
+          autocomplete="off"
+        />
+        <button class="search-btn" id="search-btn" onclick="geocodeAddress()">Find</button>
+      </div>
+      <p class="search-hint">Street address in Marshall County, OK</p>
+    </div>
+
+    <div class="result-panel" id="result-panel">
+      <!-- idle state -->
+      <div class="status-idle" id="state-idle">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1B4F8A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <p>Enter your address above to highlight your precinct on the map.</p>
+      </div>
+      <!-- loading state (hidden) -->
+      <div class="status-loading" id="state-loading" style="display:none">
+        <div class="spinner"></div>
+        <p id="loading-msg">Looking up your address…</p>
+      </div>
+      <!-- error state (hidden) -->
+      <div class="status-error" id="state-error" style="display:none"></div>
+      <!-- found state (hidden) -->
+      <div id="state-found" style="display:none">
+        <div class="precinct-card" id="found-card">
+          <div class="precinct-card-top">
+            <div class="label">Your Precinct</div>
+            <h2 id="found-name">—</h2>
+          </div>
+          <div class="precinct-card-body">
+            <p>You live in this voting precinct. Click the button below to let us know you're interested in serving as a Precinct Captain — no experience required!</p>
+            <a id="found-cta" href="#" class="cta-btn">Become Precinct Captain →</a>
+          </div>
+        </div>
+
+        <div class="precinct-list-head">All Precincts</div>
+        <div id="precinct-list"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────
+  const CONTACT_EMAIL = 'info@mcdemocrats.com';
+  const COUNTY_FIPS   = '40095'; // Oklahoma Marshall County
+
+  // Marshall County center & bounds
+  const CENTER   = [34.02, -96.77];
+  const BOUNDS   = [[33.84, -97.15], [34.19, -96.40]];
+
+  // ── Map init ─────────────────────────────────────────────────
+  const map = L.map('map', {
+    center: CENTER,
+    zoom: 10,
+    maxBounds: L.latLngBounds([[33.6, -97.4], [34.5, -96.1]]),
+    maxBoundsViscosity: 0.85,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(map);
+
+  // ── State ────────────────────────────────────────────────────
+  let precinctLayer   = null;
+  let highlightLayer  = null;
+  let allFeatures     = [];
+  let activePrecinctId = null;
+  let userMarker       = null;
+
+  // ── Color helpers ────────────────────────────────────────────
+  const COLORS = ['#1B4F8A','#2E6BA8','#3D7CC9','#5490D4','#6AA3DF','#82B5E8','#9AC6F0','#B3D6F7'];
+  const colorMap = {};
+  let colorIdx = 0;
+  function precinctColor(id) {
+    if (!colorMap[id]) { colorMap[id] = COLORS[colorIdx++ % COLORS.length]; }
+    return colorMap[id];
+  }
+
+  function defaultStyle(feature) {
+    const id = precinctId(feature);
+    return {
+      fillColor: precinctColor(id),
+      fillOpacity: 0.22,
+      color: '#0D2340',
+      weight: 1.5,
+      opacity: 0.7,
+    };
+  }
+  function highlightStyle(feature) {
+    return {
+      fillColor: '#C0232C',
+      fillOpacity: 0.45,
+      color: '#8B0000',
+      weight: 2.5,
+      opacity: 1,
+    };
+  }
+  function dimStyle(feature) {
+    return {
+      fillColor: '#AAAAAA',
+      fillOpacity: 0.08,
+      color: '#999',
+      weight: 1,
+      opacity: 0.4,
+    };
+  }
+
+  function precinctId(feature) {
+    const p = feature.properties;
+    return p.PRECINCT_I || p.PrecinctID || p.PRECINCTID || p.precinct_id || p.OBJECTID || 'unknown';
+  }
+  function precinctName(feature) {
+    const p = feature.properties;
+    const raw = p.PRECINCT_N || p.PrecinctName || p.PRECINCTNA || p.precinct || p.NAME || '';
+    // Format nicely: if it's just a number, call it "Precinct N"
+    if (/^\d+$/.test(raw.trim())) return `Precinct ${parseInt(raw)}`;
+    return raw || `Precinct ${precinctId(feature)}`;
+  }
+
+  function emailHref(pName) {
+    const subject = encodeURIComponent(`Interest in Becoming Precinct Captain — ${pName}`);
+    const body = encodeURIComponent(
+      `Hello,\n\nI am interested in serving as a Precinct Captain for ${pName} with the Marshall County Democratic Party.\n\nPlease contact me with more information.\n\nThank you!`
+    );
+    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+  }
+
+  function precinctId(feature) {
+    const p = feature.properties;
+    return p.PRECINCT || p.PRECINCT_I || p.OBJECTID || 'unknown';
+  }
+  function precinctName(feature) {
+    const p = feature.properties;
+    return p.PRECINCT_N || p.DIST_NAME || `Precinct ${p.PRECINCT}` || 'Unknown Precinct';
+  }
+
+  function renderPrecincts(data) {
+    if (precinctLayer) map.removeLayer(precinctLayer);
+
+    precinctLayer = L.geoJSON(data, {
+      style: defaultStyle,
+      onEachFeature(feature, layer) {
+        const name = precinctName(feature);
+        const id   = precinctId(feature);
+
+        layer.on('click', () => selectPrecinct(id, feature, layer));
+        layer.on('mouseover', function() {
+          if (id !== activePrecinctId) this.setStyle({ fillOpacity: 0.38, weight: 2 });
+          this.bindTooltip(name, { sticky: true, className: 'precinct-tip' }).openTooltip();
+        });
+        layer.on('mouseout', function() {
+          if (id !== activePrecinctId) precinctLayer.resetStyle(this);
+          this.closeTooltip();
+        });
+      }
+    }).addTo(map);
+
+    try { map.fitBounds(precinctLayer.getBounds(), { padding: [20, 20] }); } catch(e) {}
+  }
+
+  function renderList() {
+    const container = document.getElementById('precinct-list');
+    container.innerHTML = '';
+    const sorted = [...allFeatures].sort((a, b) => precinctName(a).localeCompare(precinctName(b)));
+    sorted.forEach(feature => {
+      const id   = precinctId(feature);
+      const name = precinctName(feature);
+      const el   = document.createElement('div');
+      el.className = 'precinct-list-item';
+      el.id = `list-item-${id}`;
+      el.innerHTML = `<span>${name}</span><span class="num">${allFeatures.indexOf(feature)+1}</span>`;
+      el.addEventListener('click', () => {
+        precinctLayer.eachLayer(layer => {
+          if (precinctId(layer.feature) === id) {
+            selectPrecinct(id, feature, layer);
+            map.fitBounds(layer.getBounds(), { padding: [40, 40] });
+          }
+        });
+      });
+      container.appendChild(el);
+    });
+  }
+
+  function selectPrecinct(id, feature, layer) {
+    activePrecinctId = id;
+    const name = precinctName(feature);
+
+    // Reset all styles
+    precinctLayer.eachLayer(l => {
+      if (precinctId(l.feature) === id) {
+        l.setStyle(highlightStyle());
+      } else {
+        l.setStyle(dimStyle());
+      }
+    });
+
+    // List highlight
+    document.querySelectorAll('.precinct-list-item').forEach(el => el.classList.remove('active'));
+    const listEl = document.getElementById(`list-item-${id}`);
+    if (listEl) { listEl.classList.add('active'); listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+    // Show popup on map
+    const center = layer.getBounds().getCenter();
+    L.popup({ closeButton: true, offset: [0, -5] })
+      .setLatLng(center)
+      .setContent(`
+        <div class="popup-inner">
+          <div class="popup-head">
+            <div class="sub">Marshall County Democrats</div>
+            <h3>${name}</h3>
+          </div>
+          <div class="popup-body">
+            <p>Want to help lead Democrats in ${name}? Precinct Captains are the backbone of local organizing.</p>
+            <a class="popup-cta" href="${emailHref(name)}">Become Precinct Captain →</a>
+          </div>
+        </div>
+      `)
+      .addTo(map);
+
+    // Show found state if not already visible
+    showFoundState(name, id);
+  }
+
+  function showFoundState(name, id) {
+    setState('found');
+    document.getElementById('found-name').textContent = name;
+    document.getElementById('found-cta').href = emailHref(name);
+  }
+
+  // ── Address geocoding ────────────────────────────────────────
+  async function geocodeAddress() {
+    const raw = document.getElementById('addr-input').value.trim();
+    if (!raw) return;
+
+    // Append county+state if not present
+    const query = raw.toLowerCase().includes('oklahoma') || raw.toLowerCase().includes(', ok')
+      ? raw : `${raw}, Marshall County, Oklahoma`;
+
+    setState('loading');
+    document.getElementById('loading-msg').textContent = 'Looking up your address…';
+
+    let lat, lon;
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${encodeURIComponent(query)}&countrycodes=us&viewbox=-97.15,34.19,-96.40,33.84&bounded=1`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const results = await res.json();
+
+      if (!results || results.length === 0) {
+        // Try without bounded
+        const url2 = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${encodeURIComponent(query)}&countrycodes=us`;
+        const res2 = await fetch(url2, { headers: { 'Accept-Language': 'en' } });
+        const results2 = await res2.json();
+        if (!results2 || results2.length === 0) throw new Error('Address not found. Try including your street number and city.');
+        lat = parseFloat(results2[0].lat);
+        lon = parseFloat(results2[0].lon);
+      } else {
+        lat = parseFloat(results[0].lat);
+        lon = parseFloat(results[0].lon);
+      }
+    } catch(e) {
+      setState('error', e.message || 'Could not look up that address. Please check the spelling and try again.');
+      return;
+    }
+
+    // Place marker
+    if (userMarker) map.removeLayer(userMarker);
+    const markerIcon = L.divIcon({
+      html: `<div style="background:#C0232C;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+      className: '',
+    });
+    userMarker = L.marker([lat, lon], { icon: markerIcon }).addTo(map);
+
+    // Find which precinct contains the point
+    document.getElementById('loading-msg').textContent = 'Finding your precinct…';
+    const pt = L.latLng(lat, lon);
+    let matched = false;
+
+    map.setView([lat, lon], 12);
+
+    precinctLayer.eachLayer(layer => {
+      if (matched) return;
+      try {
+        if (isPointInLayer(pt, layer)) {
+          matched = true;
+          const id   = precinctId(layer.feature);
+          const name = precinctName(layer.feature);
+          selectPrecinct(id, layer.feature, layer);
+          map.fitBounds(layer.getBounds(), { padding: [60, 60] });
+        }
+      } catch(e) {}
+    });
+
+    if (!matched) {
+      setState('error', 'Your address was found on the map, but we couldn\'t match it to a precinct. This may mean the address is outside Marshall County, or there\'s a gap in our precinct data. Try clicking a precinct directly on the map.');
+    }
+  }
+
+  // Point-in-polygon using Leaflet bounds + ray casting
+  function isPointInLayer(pt, layer) {
+    if (!layer.getBounds().contains(pt)) return false;
+    if (layer.feature.geometry.type === 'Polygon') {
+      return pointInPolygon([pt.lng, pt.lat], layer.feature.geometry.coordinates[0]);
+    }
+    if (layer.feature.geometry.type === 'MultiPolygon') {
+      return layer.feature.geometry.coordinates.some(poly =>
+        pointInPolygon([pt.lng, pt.lat], poly[0])
+      );
+    }
+    return false;
+  }
+
+  function pointInPolygon(point, polygon) {
+    const x = point[0], y = point[1];
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0], yi = polygon[i][1];
+      const xj = polygon[j][0], yj = polygon[j][1];
+      if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+        inside = !inside;
+      }
+    }
+    return inside;
+  }
+
+  // ── UI state helpers ─────────────────────────────────────────
+  function setState(state, msg) {
+    ['idle', 'loading', 'error', 'found'].forEach(s => {
+      const el = document.getElementById(`state-${s}`);
+      if (el) el.style.display = 'none';
+    });
+    const target = document.getElementById(`state-${state}`);
+    if (target) target.style.display = '';
+    if (state === 'error' && msg) target.textContent = msg;
+  }
+
+  // keyboard enter on search
+  document.getElementById('addr-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') geocodeAddress();
+  });
+
+  // ── Fallback hardcoded approximate precincts for Marshall County ──
+  // Based on official Oklahoma precinct map for Marshall County.
+  // These are approximate boundaries; users should verify with the
+  // official Oklahoma Voter Portal at okvoterportal.okelections.gov
+  // ── Boot ─────────────────────────────────────────────────────
+  async function loadPrecincts() {
+    let data = null;
+    try {
+      const res = await fetch('./marshall-precincts.geojson');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      data = await res.json();
+    } catch(e) {
+      document.getElementById('state-error').textContent = 'Could not load precinct data. Make sure marshall-precincts.geojson is in the same folder as this page.';
+      document.getElementById('state-error').style.display = '';
+      document.getElementById('state-idle').style.display = 'none';
+      return;
+    }
+    allFeatures = data.features;
+    renderPrecincts(data);
+    renderList();
+  }
+
+  loadPrecincts();
+</script>
+</body>
+</html>

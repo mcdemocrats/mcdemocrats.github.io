@@ -348,7 +348,7 @@
     .resources { background: var(--sand); }
     .resources .section-inner {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 2rem;
       margin-top: 3rem;
     }
@@ -490,13 +490,216 @@
     @media (max-width: 760px) {
       nav { display: none; }
       .get-involved .section-inner,
-      .meeting .section-inner,
-      .resources .section-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .meeting .section-inner { grid-template-columns: 1fr; gap: 2rem; }
       .resources .section-inner { grid-template-columns: 1fr; }
       .resources-intro { grid-column: auto; }
       .contact-grid { flex-direction: column; }
       .contact-item { min-width: 0; }
+      .candidates-grid { grid-template-columns: 1fr; }
     }
+    /* ── CANDIDATES ──────────────────────────────────── */
+    .candidates { background: var(--cream); }
+    .candidates .section-inner { max-width: 1100px; margin: 0 auto; }
+    .candidates-header { margin-bottom: 3rem; }
+    .candidates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .candidate-card {
+      background: var(--white);
+      border-radius: 6px;
+      box-shadow: 0 4px 20px rgba(13,35,64,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .candidate-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(13,35,64,0.15); }
+    .candidate-card-top {
+      background: var(--navy);
+      padding: 2rem 2rem 1.5rem;
+      position: relative;
+    }
+    .candidate-badge {
+      display: inline-block;
+      background: var(--red);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+    .candidate-name {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.35rem;
+    }
+    .candidate-race {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: #7EB3E8;
+      letter-spacing: 0.02em;
+    }
+    .candidate-card-body {
+      padding: 1.5rem 2rem 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .candidate-bio {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: #444;
+      line-height: 1.7;
+      flex: 1;
+    }
+    .candidate-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-candidate {
+      display: inline-block;
+      background: var(--blue);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.25rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-candidate:hover { background: var(--navy); }
+    .btn-candidate-donate {
+      display: inline-block;
+      background: var(--red);
+      color: var(--white);
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.25rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-candidate-donate:hover { background: #a01d25; }
+    /* Run for office CTA box */
+    .run-box {
+      background: var(--navy);
+      border-radius: 6px;
+      padding: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .run-box-text h3 {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .run-box-text p {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: #A8C4E0;
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    @media (max-width: 760px) {
+      .run-box { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── PRECINCT SECTION ────────────────────────────────── */
+    .precinct-cta { background: var(--navy); }
+    .precinct-cta .section-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .precinct-cta .section-title { color: var(--white); }
+    .precinct-cta .section-body { color: #A8C4E0; }
+    .precinct-map-preview {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .precinct-map-preview-header {
+      background: var(--blue);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .precinct-map-preview-header span {
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .precinct-map-preview-body {
+      padding: 1.5rem;
+    }
+    .precinct-map-preview-body p {
+      font-size: 0.9rem;
+      color: #A8C4E0;
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+    .precinct-steps {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    .precinct-steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: #A8C4E0;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .precinct-steps li:last-child { border-bottom: none; }
+    .step-num {
+      background: var(--red);
+      color: var(--white);
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    @media (max-width: 760px) {
+      .precinct-cta .section-inner { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -516,10 +719,12 @@
       </div>
     </a>
     <nav>
+      <a href="#candidates">Run For Office</a>
+      <a href="#precincts">Find Your Precinct</a>
       <a href="#meetings">Meetings</a>
       <a href="#register">Vote</a>
       <a href="#contact">Contact</a>
-      <a href="mailto:chair@mcdemocrats.com" class="nav-cta">Get Involved</a>
+      <a href="mailto:info@mcdemocrats.com" class="nav-cta">Get Involved</a>
     </nav>
   </div>
 </header>
@@ -528,10 +733,10 @@
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-eyebrow">Marshall County &nbsp;·&nbsp; Oklahoma</div>
-    <h1>Building a Stronger<br><em>Marshall County</em></h1>
+    <h1>Building a Stronger<br><em>Democratic Marshall County</em></h1>
     <p>We're neighbors working together for better schools, good jobs, and a government that represents everyone. Join us.</p>
     <div class="hero-actions">
-      <a href="mailto:chair@mcdemocrats.com?subject=I want to get involved" class="btn-primary">Get Involved</a>
+      <a href="mailto:info@mcdemocrats.com?subject=I want to get involved" class="btn-primary">Get Involved</a>
       <a href="#meetings" class="btn-ghost">Next Meeting ↓</a>
     </div>
   </div>
@@ -554,7 +759,55 @@
     <div class="get-involved-right reveal" style="transition-delay:0.15s">
       <h3>Ready to make a difference?</h3>
       <p>Send us an email and a party officer will be in touch to connect you with the right opportunity. No experience necessary — just bring yourself.</p>
-      <a href="mailto:chair@mcdemocrats.com?subject=I want to get involved with Marshall County Democrats" class="btn-primary">Email Us to Get Involved</a>
+      <a href="mailto:info@mcdemocrats.com?subject=I want to get involved with Marshall County Democrats" class="btn-primary">Email Us to Get Involved</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── CANDIDATES ────────────────────────────────────────── -->
+<section class="candidates" id="candidates">
+  <div class="section-inner">
+    <div class="candidates-header reveal">
+      <div class="section-label">2026 Elections</div>
+      <h2 class="section-title">Run For Office</h2>
+      <div class="rule"></div>
+    </div>
+
+    <!-- Run for Office CTA -->
+    <div class="run-box reveal">
+      <div class="run-box-text">
+        <h3>Could You Be Our Next Candidate?</h3>
+        <p>Marshall County needs bold Democrats willing to step up and run for office — from school board and city council to the state legislature. If you've ever thought about running, let's talk. We'll support you every step of the way.</p>
+      </div>
+      <a href="mailto:info@mcdemocrats.com?subject=I'm interested in running for office in Marshall County" class="btn-primary" style="white-space:nowrap; flex-shrink:0;">Run for Office →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FIND YOUR PRECINCT ────────────────────────────────── -->
+<section class="precinct-cta" id="precincts">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Organize Your Neighborhood</div>
+      <h2 class="section-title">Find Your Precinct</h2>
+      <div class="rule"></div>
+      <p class="section-body">Marshall County is divided into 9 voting precincts. Every precinct needs a Democratic captain — a neighbor who knocks doors, turns out voters, and represents their community. Find yours and see how you can help lead.</p>
+      <a href="precincts.html" class="btn-primary" style="display:inline-block; margin-top:1.5rem;">Open the Precinct Map →</a>
+    </div>
+    <div class="precinct-map-preview reveal" style="transition-delay:0.15s">
+      <div class="precinct-map-preview-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Interactive Precinct Map</span>
+      </div>
+      <div class="precinct-map-preview-body">
+        <p>Enter your address to instantly see which of Marshall County's 9 voting precincts you live in — then sign up to become a Precinct Captain.</p>
+        <ul class="precinct-steps">
+          <li><span class="step-num">1</span> Enter your Marshall County address</li>
+          <li><span class="step-num">2</span> Your precinct is highlighted on the map</li>
+          <li><span class="step-num">3</span> Click to email us about becoming Precinct Captain</li>
+        </ul>
+        <a href="precincts.html" class="btn-primary" style="display:block; text-align:center;">Open Precinct Map →</a>
+      </div>
     </div>
   </div>
 </section>
@@ -620,7 +873,7 @@
           </div>
           <div class="detail-text">
             <strong>Questions?</strong>
-            <a href="mailto:chair@mcdemocrats.com">chair@mcdemocrats.com</a>
+            <a href="mailto:info@mcdemocrats.com">info@mcdemocrats.com</a>
           </div>
         </div>
       </div>
@@ -667,6 +920,20 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
     </div>
+
+    <div class="resource-card reveal" style="transition-delay:0.3s">
+      <div class="resource-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4F8A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <h3>Find Your Precinct</h3>
+      <p>Enter your address on our interactive precinct map to see which voting precinct you live in — and find out how you can help lead Democrats in your neighborhood as a Precinct Captain.</p>
+      <a href="precincts.html" class="resource-link">
+        Open Precinct Map
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -680,7 +947,7 @@
       <p class="section-body">Have a question, want to get involved, or just want to say hello? Reach out — we'd love to hear from you.</p>
     </div>
     <div class="contact-grid reveal" style="transition-delay:0.15s">
-      <a href="mailto:chair@mcdemocrats.com" class="contact-item">
+      <a href="mailto:info@mcdemocrats.com" class="contact-item">
         <div class="contact-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EB3E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -688,7 +955,7 @@
         </div>
         <div class="contact-info">
           <strong>Email</strong>
-          <span>chair@mcdemocrats.com</span>
+          <span>info@mcdemocrats.com</span>
         </div>
       </a>
       <a href="tel:+15804400055" class="contact-item">
@@ -711,7 +978,7 @@
 <footer>
   <p>
     <strong style="color:#7EB3E8;">Marshall County Democratic Party</strong><br>
-    <a href="mailto:chair@mcdemocrats.com">chair@mcdemocrats.com</a> &nbsp;·&nbsp; <a href="tel:+15804400055">(580) 440-0055</a><br><br>
+    <a href="mailto:info@mcdemocrats.com">info@mcdemocrats.com</a> &nbsp;·&nbsp; <a href="tel:+15804400055">(580) 440-0055</a><br><br>
     Paid for by the Marshall County Democratic Party. Not authorized by any candidate or candidate's committee.<br>
     &copy; <span id="yr"></span> Marshall County Democratic Party &nbsp;·&nbsp; <a href="http://mcdemocrats.com">mcdemocrats.com</a>
   </p>
@@ -732,16 +999,6 @@
     });
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
-</script>
-
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8BF7036TMF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-8BF7036TMF');
 </script>
 </body>
 </html>
