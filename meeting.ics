@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Marshall County Democratic Party//mcdemocrats.com//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+DTSTART;TZID=America/Chicago:20260512T180000
+DTEND;TZID=America/Chicago:20260512T190000
+RRULE:FREQ=MONTHLY;BYDAY=2TU
+SUMMARY:Marshall County Democratic Party Meeting
+DESCRIPTION:Monthly meeting open to all Democrats and interested community members in Marshall County. No registration required — just show up.\n\nMore info: https://mcdemocrats.com
+LOCATION:14 S Main St\, Kingston\, OK 73439
+URL:https://mcdemocrats.com
+ORGANIZER;CN=Marshall County Democratic Party:mailto:info@mcdemocrats.com
+END:VEVENT
+END:VCALENDAR
