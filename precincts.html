@@ -39,16 +39,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
-
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8BF7036TMF"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-8BF7036TMF');
-  </script>
 
   <!-- PostHog -->
   <script>
@@ -276,7 +267,6 @@
       el.id = `list-item-${id}`;
       el.innerHTML = `<span>${name}</span><span class="num">${allFeatures.indexOf(feature)+1}</span>`;
       el.addEventListener('click', () => {
-        if (typeof gtag !== 'undefined') gtag('event', 'click-precinct-list-item', { precinct_name: name });
         if (typeof posthog !== 'undefined') posthog.capture('click-precinct-list-item', { precinct_name: name });
         precinctLayer.eachLayer(layer => {
           if (precinctId(layer.feature) === id) {
@@ -292,7 +282,6 @@
   function selectPrecinct(id, feature, layer) {
     activePrecinctId = id;
     const name = precinctName(feature);
-    if (typeof gtag !== 'undefined') gtag('event', 'click-precinct-map', { precinct_name: name });
     if (typeof posthog !== 'undefined') posthog.capture('click-precinct-map', { precinct_name: name });
 
     // Reset all styles
@@ -478,7 +467,6 @@
     const el = e.target.closest('[data-track]');
     if (!el) return;
     const params = el.dataset.precinctName ? { precinct_name: el.dataset.precinctName } : undefined;
-    if (typeof gtag !== 'undefined') gtag('event', el.dataset.track, params);
     if (typeof posthog !== 'undefined') posthog.capture(el.dataset.track, params);
   });
 

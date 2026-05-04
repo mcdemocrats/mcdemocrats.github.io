@@ -47,21 +47,18 @@ CSS custom properties defined in `:root`:
 
 ## Analytics
 
-Both pages fire identical events to GA4 and PostHog in parallel. A single delegated `click` listener on `document` reads `data-track` attributes and calls both SDKs. Two events in `precincts.html` are fired directly from JS (not via `data-track`) because they need a `precinct_name` parameter resolved at runtime:
+All pages fire events to PostHog. A single delegated `click` listener on `document` reads `data-track` attributes. Two events in `precincts.html` are fired directly from JS (not via `data-track`) because they need a `precinct_name` parameter resolved at runtime:
 
 ```js
 // delegated (all data-track elements)
-if (typeof gtag !== 'undefined') gtag('event', el.dataset.track, params);
 if (typeof posthog !== 'undefined') posthog.capture(el.dataset.track, params);
 
 // direct (precincts page only)
-gtag('event', 'click-precinct-map', { precinct_name: name });
 posthog.capture('click-precinct-map', { precinct_name: name });
 ```
 
 Events that carry `precinct_name` use `data-precinct-name` on the element (set dynamically by `showFoundState()` for the sidebar CTA, and injected into the Leaflet popup template string). All event names are kebab-case.
 
-- **Google Analytics 4** — measurement ID `G-8BF7036TMF`
 - **PostHog** — project key `phc_wAtyDUxEMvLY6Pwc3s2aY4QR4ZUfZTHZXCTLUYS9ywVw`, host `us.i.posthog.com`
 
 ## Key External Dependencies
