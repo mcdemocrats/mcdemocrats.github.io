@@ -3,7 +3,9 @@
     "allow": [
       "Bash(python -c ' *)",
       "Bash(node -e ' *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "PowerShell(cd \"C:\\\\code\\\\mcdemocrats.github.io\"; Select-String -Path \"dist\\\\index.html\" -Pattern \"posthog.init|meeting-band|contact-grid|precinct-cta|footer\" | Select-Object -First 15 | ForEach-Object { $_.Line.Trim\\(\\) })",
+      "PowerShell(cd \"C:\\\\code\\\\mcdemocrats.github.io\"; Select-String -Path \"dist\\\\precincts.html\" -Pattern \"map-page|leaflet|geocodeAddress|marshall-precincts\" | Select-Object -First 8 | ForEach-Object { $_.Line.Trim\\(\\) })"
     ]
   }
 }

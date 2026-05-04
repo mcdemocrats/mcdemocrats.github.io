@@ -4,27 +4,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Static website for the Marshall County Democratic Party (Oklahoma), hosted via GitHub Pages at `mcdemocrats.com`. No build system, no dependencies, no package manager — CSS lives in `styles.css`, JS is inline in each HTML file.
+Static website for the Marshall County Democratic Party (Oklahoma), hosted via GitHub Pages at `mcdemocrats.com`. Built with a Node.js static site generator (`build.js`) — no frameworks, no npm dependencies, just ES modules and template literals.
+
+**Source lives in `src/`.** The root `.html` files are the old hand-authored versions kept for reference; the authoritative output is `dist/` produced by the build.
 
 ## Development
 
-Open files directly in a browser. No build step, no server required. To preview locally with correct relative paths (needed for `marshall-precincts.geojson` fetch in `precincts.html`):
-
 ```bash
-python -m http.server 8000
-# or
-npx serve .
+node build.js        # generate dist/
+npm run dev          # build + serve dist/ locally (requires npx)
 ```
 
-Deploy is automatic: push to `main` → GitHub Pages publishes to `mcdemocrats.com` (configured via `CNAME`).
+For the precinct map's `marshall-precincts.geojson` fetch to work, you need a local server (not `file://`). `npm run dev` handles this.
+
+Deploy is automatic: push to `main` → GitHub Actions runs `node build.js` → deploys `dist/` to GitHub Pages via the Pages artifact API (see `.github/workflows/deploy.yml`). **GitHub Pages must be configured to use GitHub Actions as the source** (Settings → Pages → Source: GitHub Actions).
 
 ## Architecture
 
-Two standalone HTML pages sharing a single `styles.css`. JS remains inline in each page.
+### Build system
 
-- **`index.html`** — Main site. Sections: Hero, Meeting Banner, Get Involved, Find Your Precinct (teaser), Meetings, Voter Resources, Contact, Footer. Uses IntersectionObserver for `.reveal` scroll animations.
+```
+src/
+  data.js              site-wide config (contact, meeting, PostHog, forms, nav)
+  layouts/
+    page.js            renderPage() — wraps any page in html/head/body
+  partials/
+    posthog.js         PostHog init snippet (identical on all pages)
+    header.js          headerMain(), headerMap(), headerSimple()
+    footer.js          footerFull() (index), footerSimple() (privacy)
+    scripts.js         shared JS snippets (analytics, year, scroll reveal)
+  pages/
+    index.js           render(site) → full index page HTML
+    precincts.js       render(site) → full precincts page HTML
+    privacy.js         render(site) → full privacy page HTML
+build.js               renders all pages, copies static assets → dist/
+```
 
-- **`precincts.html`** — Interactive precinct map. Split-panel layout: 360px sidebar + full-height Leaflet map. Loads `marshall-precincts.geojson` via `fetch()` at runtime. Geocodes addresses through the Nominatim API (OpenStreetMap), then does point-in-polygon matching client-side using a ray-casting algorithm.
+Static assets (`styles.css`, `marshall-precincts.geojson`, favicons, `og-image.png`, `meeting.ics`, `CNAME`) are copied from the root into `dist/` unchanged.
+
+### Pages
+
+- **`src/pages/index.js`** — Main site. Sections: Hero, Meeting Banner, Contact, Find Your Precinct (teaser), Meetings, Voter Resources. Uses IntersectionObserver for `.reveal` scroll animations.
+
+- **`src/pages/precincts.js`** — Interactive precinct map. Split-panel layout: 360px sidebar + full-height Leaflet map. Loads `marshall-precincts.geojson` via `fetch()` at runtime. Geocodes addresses through the Nominatim API (OpenStreetMap), then does point-in-polygon matching client-side using a ray-casting algorithm.
+
+- **`src/pages/privacy.js`** — Privacy policy page.
 
 - **`marshall-precincts.geojson`** — Marshall County's 9 voting precincts. GeoJSON `FeatureCollection`. Properties read by JS: `PRECINCT`, `PRECINCT_I`, `PRECINCT_N`, `DIST_NAME`, `OBJECTID`. The JS handles multiple possible property name variants for compatibility with different GIS exports.
 
@@ -70,6 +94,13 @@ Events that carry `precinct_name` use `data-precinct-name` on the element (set d
 
 ## Content
 
-Meeting details are hardcoded in `index.html`: second Tuesday of each month, 6:00 PM, 14 S Main St, Kingston, OK 73439. Update the meeting band and the meeting card section together when details change.
+All site-wide content is centralized in **`src/data.js`**:
+- Meeting schedule, time, and location → `site.meeting.*`
+- Contact email, phone, Facebook links → `site.contact.*`
+- Form URLs (volunteer, precinct officer) → `site.forms.*`
+- Nav links → `site.nav`
+- PostHog config → `site.posthog`
+
+After editing `src/data.js`, run `node build.js` to regenerate `dist/`.
 
 Contact: `info@mcdemocrats.com` / `(580) 440-0055` / Facebook `groups/mcdemocrats`

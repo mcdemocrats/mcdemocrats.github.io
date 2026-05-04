@@ -1,0 +1,10 @@
+{
+  "name": "mcdemocrats-site",
+  "version": "1.0.0",
+  "description": "Marshall County Democratic Party website",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && npx serve dist"
+  }
+}
