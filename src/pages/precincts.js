@@ -320,7 +320,7 @@ function mapScript(site) {
     });
 
     if (!matched) {
-      setState('error', 'Your address was found on the map, but we couldn\'t match it to a precinct. This may mean the address is outside Marshall County, or there\'s a gap in our precinct data. Try clicking a precinct directly on the map.');
+      setState('error', 'Your address was found on the map, but we couldn\\'t match it to a precinct. This may mean the address is outside Marshall County, or there\\'s a gap in our precinct data. Try clicking a precinct directly on the map.');
     }
   }
 
